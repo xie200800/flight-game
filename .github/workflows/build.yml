@@ -1,0 +1,33 @@
+name: Build APK
+on:
+  push:
+    branches: [ main ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Unzip game project
+        run: unzip flight_sim-4.zip -d game_src
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Grant execute permission
+        working-directory: ./game_src
+        run: chmod +x gradlew
+
+      - name: Compile Release APK
+        working-directory: ./game_src
+        run: ./gradlew assembleRelease
+
+      - name: Save built‑APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: output-apk
+          path: game_src/**/build/outputs/apk/release/*.apk
